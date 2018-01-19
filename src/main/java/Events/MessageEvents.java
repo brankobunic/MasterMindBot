@@ -1,5 +1,6 @@
 package Events;
 
+import net.dv8tion.jda.core.entities.Emote;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.Message.Attachment;
 import net.dv8tion.jda.core.entities.MessageChannel;
@@ -43,20 +44,37 @@ public class MessageEvents {
 		strMessage = message.getContentRaw();
 		strUser = user.getName();
 		strChannel = channel.getName();
+		List<Emote> emotes = message.getEmotes();
 
 		if (strMessage.startsWith("!")) { // checks to see if the message starts with an !, which will be the default
 											// command invoke character on this bot
 			handleCommands(strMessage, channel); // passes the data off to a separate function to handle commands
+
+			for (Emote e : emotes) {
+				System.out.println(e.getName());
+				channel.sendMessage(e.getName());
+			}
 		}
 
-		if (strMessage.equals("?map")) {
+		if (strMessage.contains("?map")) {
+
+			Color c1;
+			Color c2;
+
+			if (!emotes.isEmpty()) {
+				c1 = checkColor(emotes.get(0));
+				c2 = checkColor(emotes.get(1));
+			} else {
+				c1 = Color.MAGENTA;
+				c2 = Color.BLUE;
+			}
 
 			File img = convertToFile(message, channel);
 			channel.sendMessage("This will take a few moments...").queue();
 
 			BufferedImage buff;
 			try {
-				Gradient g = new Gradient(Color.MAGENTA, Color.DARK_GRAY, true);
+				Gradient g = new Gradient(c1, c2, true);
 
 				buff = ImageIO.read(img);
 
@@ -164,5 +182,47 @@ public class MessageEvents {
 			return null;
 		}
 		return outStream.toByteArray();
+	}
+
+	public static Color checkColor(Emote e) {
+
+		Color c = null;
+
+		switch (e.getName()) {
+
+		case "cY":
+			c = Color.YELLOW;
+			break;
+
+		case "cW":
+			c = Color.WHITE;
+			break;
+
+		case "cR":
+			c = Color.RED;
+			break;
+
+		case "cM":
+			c = Color.PINK;
+			break;
+
+		case "cK":
+			c = Color.BLACK;
+			break;
+
+		case "cG":
+			c = Color.GREEN;
+			break;
+
+		case "cC":
+			c = Color.CYAN;
+			break;
+
+		case "cB":
+			c = Color.BLUE;
+			break;
+		}
+
+		return c;
 	}
 }
