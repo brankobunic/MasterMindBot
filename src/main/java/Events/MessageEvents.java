@@ -35,6 +35,8 @@ import com.tiggerbiggo.prima.processing.fragment.ImageConvertFragment;
 import com.tiggerbiggo.prima.processing.fragment.MapGenFragment;
 import com.tiggerbiggo.prima.processing.fragment.RenderFragment;
 
+import Utils.FragmentGenerator;
+
 public class MessageEvents {
 	private String strMessage;
 	private String strUser;
@@ -50,51 +52,14 @@ public class MessageEvents {
 											// command invoke character on this bot
 			handleCommands(strMessage, channel); // passes the data off to a separate function to handle commands
 
-			for (Emote e : emotes) {
-				System.out.println(e.getName());
-				channel.sendMessage(e.getName());
-			}
 		}
 
 		if (strMessage.contains("?map")) {
-
-			Color c1;
-			Color c2;
-
-			if (!emotes.isEmpty()) {
-				c1 = checkColor(emotes.get(0));
-				c2 = checkColor(emotes.get(1));
-			} else {
-				c1 = Color.MAGENTA;
-				c2 = Color.BLUE;
-			}
-
-			File img = convertToFile(message, channel);
-			channel.sendMessage("This will take a few moments...").queue();
-
-			BufferedImage buff;
-			try {
-				Gradient g = new Gradient(c1, c2, true);
-
-				buff = ImageIO.read(img);
-
-				MapGenFragment gen = new MapGenFragment(Vector2.ZERO, Vector2.ONE);
-
-				ImageConvertFragment imgFragment = new ImageConvertFragment(buff, gen, ColorProperty.V);
-
-				RenderFragment render = new RenderFragment(imgFragment, 50, g);
-				Builder builder = new Builder(render.build(new Vector2(200)));
-
-				builder.startBuild();
-				builder.joinAll();
-
-				channel.sendFile(writeByteArray(builder.getImgs()), "image.gif").queue();
-
-				channel.sendMessage("Voilà!!").queue();
-			} catch (IOException | IllegalMapSizeException e) {
-				e.printStackTrace();
-			}
-
+			FragmentGenerator.MapGenImage(message, channel);
+		}
+		
+		if (strMessage.contains("?noise")) {
+			FragmentGenerator.NoiseGenImage(message, channel);
 		}
 
 	}
@@ -118,111 +83,4 @@ public class MessageEvents {
 
 	}
 
-	public File convertToFile(Message message, MessageChannel channel) {
-
-		List<Attachment> lista = message.getAttachments();
-		Attachment att = null;
-		File img = new File("img.jpg");
-
-		if (lista.size() != 0) {
-			att = lista.get(0);
-			InputStream input = null;
-			OutputStream out = null;
-
-			try {
-				input = att.getInputStream();
-
-				out = new FileOutputStream(img);
-
-				int read = 0;
-				byte[] bytes = new byte[1024];
-
-				while ((read = input.read(bytes)) != -1) {
-					out.write(bytes, 0, read);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-				if (input != null) {
-					try {
-						input.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-				if (out != null) {
-					try {
-						out.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-
-				}
-			}
-		} else {
-			channel.sendMessage("Please add an image").queue();
-		}
-
-		return img;
-	}
-
-	public static byte[] writeByteArray(BufferedImage[] imgSequence) {
-
-		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-		try {
-			try (ImageOutputStream output = new MemoryCacheImageOutputStream(outStream)) {
-				GifSequenceWriter writer = new GifSequenceWriter(output, BufferedImage.TYPE_INT_RGB, 0, true);
-				for (BufferedImage B : imgSequence) {
-					writer.writeToSequence(B);
-				}
-				writer.close();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-		return outStream.toByteArray();
-	}
-
-	public static Color checkColor(Emote e) {
-
-		Color c = null;
-
-		switch (e.getName()) {
-
-		case "cY":
-			c = Color.YELLOW;
-			break;
-
-		case "cW":
-			c = Color.WHITE;
-			break;
-
-		case "cR":
-			c = Color.RED;
-			break;
-
-		case "cM":
-			c = Color.PINK;
-			break;
-
-		case "cK":
-			c = Color.BLACK;
-			break;
-
-		case "cG":
-			c = Color.GREEN;
-			break;
-
-		case "cC":
-			c = Color.CYAN;
-			break;
-
-		case "cB":
-			c = Color.BLUE;
-			break;
-		}
-
-		return c;
-	}
 }
