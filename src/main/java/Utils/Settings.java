@@ -6,7 +6,7 @@ import java.util.Properties;
 
 public class Settings {
     private static String token;
-    private static String path = "$PROJECT_DIR$/config.properties";
+    private static String path = "config.properties";
 
     public static String getToken() {
 

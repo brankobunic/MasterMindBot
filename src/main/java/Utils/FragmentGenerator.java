@@ -19,12 +19,14 @@ import com.tiggerbiggo.prima.core.GifSequenceWriter;
 import com.tiggerbiggo.prima.core.Vector2;
 import com.tiggerbiggo.prima.exception.IllegalMapSizeException;
 import com.tiggerbiggo.prima.graphics.Gradient;
+import com.tiggerbiggo.prima.graphics.SimpleGradient;
 import com.tiggerbiggo.prima.processing.ColorProperty;
 import com.tiggerbiggo.prima.processing.fragment.CombineFragment;
 import com.tiggerbiggo.prima.processing.fragment.CombineType;
 import com.tiggerbiggo.prima.processing.fragment.ConstFragment;
 import com.tiggerbiggo.prima.processing.fragment.ImageConvertFragment;
 import com.tiggerbiggo.prima.processing.fragment.MapGenFragment;
+import com.tiggerbiggo.prima.processing.fragment.NoiseGenFragment;
 import com.tiggerbiggo.prima.processing.fragment.RenderFragment;
 
 import net.dv8tion.jda.core.entities.Emote;
@@ -55,16 +57,18 @@ public class FragmentGenerator {
 		BufferedImage buff;
 
 		try {
-			Gradient g = new Gradient(c1, c2, true);
+			SimpleGradient g = new SimpleGradient(c1,c2,true);
+			
 
 			buff = ImageIO.read(img);
+			
 
 			MapGenFragment gen = new MapGenFragment(Vector2.ZERO, Vector2.ONE);
 
 			ImageConvertFragment imgFragment = new ImageConvertFragment(buff, gen, ColorProperty.V);
 
 			RenderFragment render = new RenderFragment(imgFragment, 50, g);
-			Builder builder = new Builder(render.build(new Vector2(200)));
+			Builder builder = new Builder(render.build(buff.getWidth(),buff.getHeight()));
 
 			builder.startBuild();
 			builder.joinAll();
@@ -99,22 +103,21 @@ public class FragmentGenerator {
 		BufferedImage buff;
 
 		try {
-			Gradient g = new Gradient(c1, c2, true);
+			SimpleGradient g = new SimpleGradient(c1,c2,true);
 
 			buff = ImageIO.read(img);
 
-			NoiseGenerator noise = new NoiseGenerator();
-			CombineFragment lessNoise = new CombineFragment(noise, new ConstFragment(new Vector2(0.1)),
-					CombineType.MULTIPLY);
+			NoiseGenFragment noise = new NoiseGenFragment(0.1);
+
 			MapGenFragment gen = new MapGenFragment(Vector2.ZERO, Vector2.ONE);
 
 			ImageConvertFragment imgFragment = new ImageConvertFragment(buff, gen, ColorProperty.V);
 
-			CombineFragment combine = new CombineFragment(lessNoise, imgFragment, CombineType.MULTIPLY);
+			CombineFragment combine = new CombineFragment(noise, imgFragment, CombineType.MULTIPLY);
 
 			RenderFragment render = new RenderFragment(combine, 60, g);
 
-			Builder builder = new Builder(render.build(new Vector2(200)));
+			Builder builder = new Builder(render.build(buff.getWidth(),buff.getHeight()));
 
 			builder.startBuild();
 			builder.joinAll();
