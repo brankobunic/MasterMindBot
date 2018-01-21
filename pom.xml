@@ -27,6 +27,11 @@
             <artifactId>JDA</artifactId>
             <version>3.5.0_327</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.tiggerbiggo</groupId>
+            <artifactId>Prima</artifactId>
+            <version>b1.2</version>
+        </dependency>
     </dependencies>
 
     <repositories>
@@ -35,6 +40,10 @@
             <name>jcenter-bintray</name>
             <url>http://jcenter.bintray.com</url>
         </repository>
+            <repository>
+                <id>jitpack.io</id>
+                <url>https://jitpack.io</url>
+            </repository>
     </repositories>
 
 

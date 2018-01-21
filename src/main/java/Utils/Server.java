@@ -18,7 +18,7 @@ import javax.security.auth.login.LoginException;
 * the event is an instance of a certain event that we want to scan for*/
 
 public class Server implements EventListener {
-	private static String TOKEN = "NO_TOKEN_HERE"; // this token is the
+	private static String TOKEN = Settings.getToken(); // this token is the
 																									// token provided by
 																									// discord (Insert
 																									// your bot token
